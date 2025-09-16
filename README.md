@@ -1,3 +1,3 @@
 # WeeklyTaskPlanner
 
-Projeto de React +tailwind de uma To-do-List aprimorada, com divisões por semana, filtros e edição.
+Projeto em React+Tailwind de uma To-Do-List mais aprimorada, com divisões semanais, filtros e edição.
