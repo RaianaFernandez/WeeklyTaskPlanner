@@ -1,13 +1,12 @@
-name: Deploy Vite app to GitHub Pages
+name: Deploy Vite App to GitHub Pages
 
-# Gatilhos
 on:
   push:
     branches: [main] # roda automaticamente no push para main
   workflow_dispatch: # permite rodar manualmente
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +31,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # token interno do GitHub
-          publish_dir: ./dist # pasta do build
-          force_orphan: true # força criação da branch gh-pages do zero
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true # cria a branch gh-pages do zero
