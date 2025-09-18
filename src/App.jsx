@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import Tasks from "./components/Tasks";
 import AddTasks from "./components/AddTasks";
+import { LanguageContext } from "./components/LanguageContext";
+import flagBr from "./assets/flag-br.svg";
+import flagEng from "./assets/flag-eng.svg";
 
-// ... outros imports
-
-// Esta função é executada apenas uma vez para inicializar o estado
 const getInitialTasks = () => {
   const savedTasks = localStorage.getItem("tasks");
 
@@ -18,29 +18,48 @@ const getInitialTasks = () => {
 };
 
 function App() {
+  const translations = {
+    pt: {
+      title: "Gerenciador de Tarefas Semanais",
+      addTasktitlePlaceholder: "Digite o Título da Tarefa",
+      WordWeek: "Semana",
+      filterLabel: "Filtrar:",
+      WordAll: "Todas",
+      StFilterOp1: "Ativas",
+      StFilterOp2: "Completas",
+      SearchPlaceHolder: "Buscar...",
+    },
+    en: {
+      title: "Weekly Task Planner",
+      addTasktitlePlaceholder: "Enter the Task Title",
+      WordWeek: "Week",
+      filterLabel: "Filter:",
+      WordAll: "All",
+      StFilterOp1: "Active",
+      StFilterOp2: "Completed",
+      SearchPlaceHolder: "Search...",
+    },
+  };
+  const [language, setLanguage] = useState("pt");
   const [tasks, setTasks] = useState(getInitialTasks);
-
-  // O useEffect é o responsável por salvar os dados
-  useEffect(() => {
-    // 1. Converte o array de tarefas para uma string JSON
-    const tasksJson = JSON.stringify(tasks);
-
-    // 2. Salva a string no localStorage com a chave 'tasks'
-    localStorage.setItem("tasks", tasksJson);
-  }, [tasks]); // O array de dependências faz o useEffect rodar sempre que 'tasks'
-
   const [stateFilter, setStateFilter] = useState("all"); //filtro de estado
   const [weekFilter, setWeekFilter] = useState("all"); //filtro de semana
   const [searchTerm, setSearchTerm] = useState(""); // Novo estado para a busca pelo titulo
   const [expandedWeek, setExpandedWeek] = useState(null); // Novo estado para expandir a semana onde uma nova task for adicionada
   const isFilterActive =
     stateFilter !== "all" || weekFilter !== "all" || searchTerm !== "";
-  // O useEffect que reage às mudanças nos filtros para que a semana nao fique presa expandida
   useEffect(() => {
-    // Se algum dos filtros mudar, reseta o estado de expansão
-    setExpandedWeek(null);
-  }, [stateFilter, weekFilter, searchTerm]); // As dependências aqui
+    const tasksJson = JSON.stringify(tasks);
+    localStorage.setItem("tasks", tasksJson);
 
+    if (
+      (expandedWeek !== null && stateFilter !== "all") ||
+      weekFilter !== "all" ||
+      searchTerm !== ""
+    ) {
+      setExpandedWeek(null);
+    }
+  }, [tasks, stateFilter, weekFilter, searchTerm, expandedWeek]);
   function getAllWeeks() {
     // 1. Pega todas as semanas de todas as tarefas
     const allWeeks = tasks.map((task) => task.week);
@@ -77,8 +96,8 @@ function App() {
     setTasks(newTasks);
   }
   function addTask(title, week) {
-    if (title.trim() === "") {
-      alert("O título da tarefa não pode estar em branco.");
+    if (title.trim() === "" || week === "") {
+      alert("Todos os campos devem ser preenchidos.");
       return; // Encerra a função se a validação falhar
     }
     const newId =
@@ -138,26 +157,44 @@ function App() {
   const availableWeeks = getAllWeeks();
 
   return (
-    <div className="w-screen h-screen  bg-slate-500 flex justify-center p-6">
-      <div className="w-[500px] space-y-4">
-        <h1 className="text-white font-bold text-center">Planner Semanal</h1>
-        <AddTasks addTask={addTask} />
-        <Tasks
-          tasks={weekGroups}
-          onTaskClick={onTaskClick}
-          deleteTask={deleteTask}
-          editTask={editTask}
-          setStateFilter={setStateFilter} // Passa a função para o componente filho
-          stateFilter={stateFilter} // Passa o estado atual do filtro
-          setSearchTerm={setSearchTerm}
-          searchTerm={searchTerm}
-          setWeekFilter={setWeekFilter}
-          getAllWeeks={availableWeeks}
-          isFilterActive={isFilterActive}
-          expandedWeek={expandedWeek}
-        />
+    <LanguageContext.Provider value={{ translations, language, setLanguage }}>
+      <div className="w-screen h-screen  bg-slate-500 flex flex-col items-center p-6 gap-6">
+        <div className="w-full flex gap-2 justify-center">
+          <div
+            className="w-[25px] h-[25px] rounded-full cursor-pointer"
+            onClick={() => setLanguage("pt")}
+          >
+            <img src={flagBr} />
+          </div>
+          <div
+            className="w-[25px] h-[25px] rounded-full cursor-pointer"
+            onClick={() => setLanguage("en")}
+          >
+            <img src={flagEng} />
+          </div>
+        </div>
+        <div className="w-[500px] space-y-4">
+          <h1 className="text-white font-bold text-center">
+            {translations[language].title}
+          </h1>
+          <AddTasks addTask={addTask} />
+          <Tasks
+            tasks={weekGroups}
+            onTaskClick={onTaskClick}
+            deleteTask={deleteTask}
+            editTask={editTask}
+            setStateFilter={setStateFilter} // Passa a função para o componente filho
+            stateFilter={stateFilter} // Passa o estado atual do filtro
+            setSearchTerm={setSearchTerm}
+            searchTerm={searchTerm}
+            setWeekFilter={setWeekFilter}
+            getAllWeeks={availableWeeks}
+            isFilterActive={isFilterActive}
+            expandedWeek={expandedWeek}
+          />
+        </div>
       </div>
-    </div>
+    </LanguageContext.Provider>
   );
 }
 

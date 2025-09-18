@@ -1,6 +1,8 @@
 import TaskItem from "./TaskItem";
 import { useState, useEffect } from "react";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
+import { useContext } from "react";
+import { LanguageContext } from "./LanguageContext";
 function TaskWeek({
   tasks,
   weekNumber,
@@ -11,6 +13,7 @@ function TaskWeek({
   expandedWeek,
 }) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { translations, language } = useContext(LanguageContext);
 
   useEffect(() => {
     // A única responsabilidade deste useEffect é reagir a um evento de expansão
@@ -32,7 +35,7 @@ function TaskWeek({
     <ul className="space-y-4 bg-slate-200 rounded-md p-6 shadow">
       <div className="flex gap-2">
         <h1 className="bg-slate-400 font-bold text-white p-2 rounded-md w-full">
-          Semana {weekNumber}
+          {translations[language].WordWeek} {weekNumber}
         </h1>
         <button
           className="bg-slate-400 text-white p-2 rounded-md"
